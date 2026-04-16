@@ -8,6 +8,7 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
     var userLocation: CLLocation?
 
     private let locationManager = CLLocationManager()
+    private var isUpdatingLocation = false
 
     override init() {
         super.init()
@@ -43,13 +44,18 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
-            manager.startUpdatingLocation()
+            if !isUpdatingLocation {
+                isUpdatingLocation = true
+                manager.startUpdatingLocation()
+            }
         default:
             break
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        userLocation = locations.last
+        if let location = locations.last {
+            userLocation = location
+        }
     }
 }
