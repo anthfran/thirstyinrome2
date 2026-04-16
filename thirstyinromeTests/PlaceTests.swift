@@ -91,3 +91,25 @@ struct ClusterTests {
         #expect(abs(clusters[0].coordinate.longitude - 12.4705) < 0.0001)
     }
 }
+
+struct LocationViewModelTests {
+
+    @Test func testAuthorizationStatusIsReadable() {
+        let vm = PlaceViewModel()
+        let _ = vm.authorizationStatus // fails to compile until property added
+    }
+
+    @Test func testLocationUnknownErrorNilsUserLocation() {
+        let vm = PlaceViewModel()
+        vm.userLocation = CLLocation(latitude: 41.9, longitude: 12.5)
+        vm.locationManager(CLLocationManager(), didFailWithError: CLError(.locationUnknown))
+        #expect(vm.userLocation == nil)
+    }
+
+    @Test func testOtherLocationErrorPreservesUserLocation() {
+        let vm = PlaceViewModel()
+        vm.userLocation = CLLocation(latitude: 41.9, longitude: 12.5)
+        vm.locationManager(CLLocationManager(), didFailWithError: CLError(.denied))
+        #expect(vm.userLocation != nil)
+    }
+}

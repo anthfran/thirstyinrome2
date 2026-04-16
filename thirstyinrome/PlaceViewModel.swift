@@ -6,6 +6,7 @@ import Observation
 final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
     var places: [Place] = []
     var userLocation: CLLocation?
+    var authorizationStatus: CLAuthorizationStatus = .notDetermined
 
     private let locationManager = CLLocationManager()
     private var isUpdatingLocation = false
@@ -34,14 +35,20 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
     private func setupLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = 10
         if locationManager.authorizationStatus == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
         }
     }
 
+    func requestAuthorization() {
+        locationManager.requestWhenInUseAuthorization()
+    }
+
     // MARK: - CLLocationManagerDelegate
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        authorizationStatus = manager.authorizationStatus
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:
             if !isUpdatingLocation {
@@ -56,6 +63,12 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             userLocation = location
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        if (error as? CLError)?.code == .locationUnknown {
+            userLocation = nil
         }
     }
 
