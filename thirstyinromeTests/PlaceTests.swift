@@ -5,12 +5,7 @@ import Foundation
 struct PlaceTests {
 
     @Test func testPlacesJSONLoads() throws {
-        guard let url = Bundle.main.url(forResource: "Places", withExtension: "json") else {
-            Issue.record("Places.json not found in Bundle.main")
-            return
-        }
-        let data = try Data(contentsOf: url)
-        let places = try JSONDecoder().decode([Place].self, from: data)
+        let places = try loadAllPlaces()
         #expect(!places.isEmpty)
     }
 
@@ -24,15 +19,15 @@ struct PlaceTests {
     }
 
     @Test func testCoordinatesInRomeBounds() throws {
-        guard let url = Bundle.main.url(forResource: "Places", withExtension: "json") else {
-            Issue.record("Places.json not found in Bundle.main")
-            return
-        }
-        let data = try Data(contentsOf: url)
-        let places = try JSONDecoder().decode([Place].self, from: data)
+        let places = try loadAllPlaces()
         for place in places {
             #expect((41.0...42.0).contains(place.lat), "lat \(place.lat) out of Rome bounds")
             #expect((12.0...13.0).contains(place.lon), "lon \(place.lon) out of Rome bounds")
         }
+    }
+
+    private func loadAllPlaces() throws -> [Place] {
+        let url = try #require(Bundle.main.url(forResource: "Places", withExtension: "json"))
+        return try JSONDecoder().decode([Place].self, from: Data(contentsOf: url))
     }
 }
