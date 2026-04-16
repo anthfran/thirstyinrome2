@@ -1,6 +1,10 @@
 import SwiftUI
 import MapKit
 
+private enum LocationButtonState {
+    case ready, noFix, unauthorized
+}
+
 struct ContentView: View {
     private static let romeCenter = CLLocationCoordinate2D(latitude: 41.899159, longitude: 12.473065)
 
@@ -13,10 +17,36 @@ struct ContentView: View {
     )
     @State private var hasJumpedToUserLocation = false
     @State private var mapSpan: Double = 0.01
+    @State private var showGPSWaitToast = false
+    @State private var showSettingsAlert = false
+
     private let romeRegion = MKCoordinateRegion(
         center: ContentView.romeCenter,
         span: MKCoordinateSpan(latitudeDelta: 0.027, longitudeDelta: 0.027)
     )
+
+    private var locationButtonState: LocationButtonState {
+        switch viewModel.authorizationStatus {
+        case .notDetermined, .denied, .restricted:
+            return .unauthorized
+        case .authorizedWhenInUse, .authorizedAlways:
+            return viewModel.userLocation != nil ? .ready : .noFix
+        @unknown default:
+            return .unauthorized
+        }
+    }
+
+    private var locationButtonIcon: String {
+        locationButtonState == .noFix ? "location.slash.fill" : "location.fill"
+    }
+
+    private var locationButtonColor: Color {
+        switch locationButtonState {
+        case .ready:        return .blue
+        case .noFix:        return .red
+        case .unauthorized: return .gray
+        }
+    }
 
     var body: some View {
         let result = viewModel.clusteringResult()
@@ -70,6 +100,38 @@ struct ContentView: View {
             .safeAreaPadding(.bottom)
             .padding(.leading, 16)
         }
+        .overlay(alignment: .bottomTrailing) {
+            Button {
+                handleLocationButtonTap()
+            } label: {
+                Label("My Location", systemImage: locationButtonIcon)
+            }
+            .buttonStyle(.bordered)
+            .tint(locationButtonColor)
+            .clipShape(.capsule)
+            .shadow(radius: 4)
+            .safeAreaPadding(.bottom)
+            .padding(.trailing, 16)
+        }
+        .overlay(alignment: .bottom) {
+            if showGPSWaitToast {
+                Text("Waiting for GPS signal\u{2026}")
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(.regularMaterial, in: Capsule())
+                    .transition(.opacity)
+                    .padding(.bottom, 80)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: showGPSWaitToast)
+        .alert("Location Access Required", isPresented: $showSettingsAlert) {
+            Button("Open Settings") {
+                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("To re-center on your position, enable Location in Settings.")
+        }
         .onMapCameraChange(frequency: .onEnd) { context in
             mapSpan = context.region.span.latitudeDelta
         }
@@ -80,6 +142,29 @@ struct ContentView: View {
                 center: location.coordinate,
                 span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
             ))
+        }
+    }
+
+    private func handleLocationButtonTap() {
+        switch locationButtonState {
+        case .ready:
+            guard let location = viewModel.userLocation else { return }
+            cameraPosition = .region(MKCoordinateRegion(
+                center: location.coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            ))
+        case .noFix:
+            showGPSWaitToast = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                showGPSWaitToast = false
+            }
+        case .unauthorized:
+            switch viewModel.authorizationStatus {
+            case .notDetermined:
+                viewModel.requestAuthorization()
+            default:
+                showSettingsAlert = true
+            }
         }
     }
 
