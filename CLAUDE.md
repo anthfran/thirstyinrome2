@@ -50,3 +50,13 @@ Single-screen SwiftUI app (iOS 17+, Xcode 26). No navigation stack, no tabs.
 ## Testing
 
 Tests use **Swift Testing** (`import Testing`, `@Test`, `#expect`, `#require`) — not XCTest. The test suite is in `thirstyinromeTests/PlaceTests.swift`. SourceKit may show "No such module 'Testing'" spuriously; `xcodebuild` is the source of truth.
+
+## Backlog
+
+Planned features and bugs are tracked in `BACKLOG.md`. IDs follow the format `FEAT-001`, `BUG-001`, `REFACTOR-001`.
+
+**Workflow for completing a backlog item:**
+1. **Brainstorm** — invoke `superpowers:brainstorming`. Flesh out requirements with the user, get design approval, and save the spec to `docs/superpowers/specs/`.
+2. **Plan** — `superpowers:brainstorming` hands off to `superpowers:writing-plans`, which saves an implementation plan to `docs/superpowers/plans/`.
+3. **Execute** — invoke `superpowers:subagent-driven-development` to implement the plan task-by-task with spec and quality review gates.
+4. **Finish** — invoke `superpowers:finishing-a-development-branch` to decide how to integrate the work.
