@@ -12,7 +12,7 @@ struct PlaceTests {
 
     @Test func testNilTitleHandled() throws {
         let json = Data("""
-        [{"lat": 41.9, "lon": 12.5}]
+        [{"id": "CCCCCCCC", "lat": 41.9, "lon": 12.5}]
         """.utf8)
         let places = try JSONDecoder().decode([Place].self, from: json)
         #expect(places.count == 1)
@@ -27,6 +27,23 @@ struct PlaceTests {
         }
     }
 
+    @Test func testPlaceIdDecodesFromJSON() throws {
+        let json = Data("""
+        [{"id": "AAAAAAAA", "title": "Test", "lat": 41.9, "lon": 12.5}]
+        """.utf8)
+        let places = try JSONDecoder().decode([Place].self, from: json)
+        #expect(places[0].id == "AAAAAAAA")
+    }
+
+    @Test func testPlaceIdIsStableAcrossDecodes() throws {
+        let json = Data("""
+        [{"id": "BBBBBBBB", "lat": 41.9, "lon": 12.5}]
+        """.utf8)
+        let a = try JSONDecoder().decode([Place].self, from: json)
+        let b = try JSONDecoder().decode([Place].self, from: json)
+        #expect(a[0].id == b[0].id)
+    }
+
     private func loadAllPlaces() throws -> [Place] {
         let url = try #require(Bundle.main.url(forResource: "Places", withExtension: "json"))
         return try JSONDecoder().decode([Place].self, from: Data(contentsOf: url))
@@ -39,8 +56,8 @@ struct ClusterTests {
     @Test func testTwoPlacesInSameCellFormOneCluster() throws {
         let vm = PlaceViewModel()
         vm.places = [
-            Place(title: "A", lat: 41.900, lon: 12.470),
-            Place(title: "B", lat: 41.901, lon: 12.471)
+            Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
+            Place(id: "BBBBBBBB", title: "B", lat: 41.901, lon: 12.471)
         ]
         let clusters = vm.clusters()
         let singles = vm.singlePlaces()
@@ -53,8 +70,8 @@ struct ClusterTests {
     @Test func testTwoPlacesInDifferentCellsAreEachSingles() {
         let vm = PlaceViewModel()
         vm.places = [
-            Place(title: "A", lat: 41.900, lon: 12.470),
-            Place(title: "B", lat: 41.950, lon: 12.520)
+            Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
+            Place(id: "BBBBBBBB", title: "B", lat: 41.950, lon: 12.520)
         ]
         let clusters = vm.clusters()
         let singles = vm.singlePlaces()
@@ -65,7 +82,7 @@ struct ClusterTests {
     // One place alone → not in clusters, appears in singlePlaces
     @Test func testOnePlaceIsASingle() {
         let vm = PlaceViewModel()
-        vm.places = [Place(title: "A", lat: 41.900, lon: 12.470)]
+        vm.places = [Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470)]
         #expect(vm.clusters().isEmpty)
         #expect(vm.singlePlaces().count == 1)
     }
@@ -82,8 +99,8 @@ struct ClusterTests {
     @Test func testClusterCentroidIsAverage() throws {
         let vm = PlaceViewModel()
         vm.places = [
-            Place(title: "A", lat: 41.900, lon: 12.470),
-            Place(title: "B", lat: 41.902, lon: 12.471)
+            Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
+            Place(id: "BBBBBBBB", title: "B", lat: 41.902, lon: 12.471)
         ]
         let clusters = vm.clusters()
         try #require(clusters.count == 1)
@@ -96,7 +113,7 @@ struct LocationViewModelTests {
 
     @Test func testAuthorizationStatusIsReadable() {
         let vm = PlaceViewModel()
-        let _ = vm.authorizationStatus // fails to compile until property added
+        let _ = vm.authorizationStatus
     }
 
     @Test func testLocationUnknownErrorNilsUserLocation() {
