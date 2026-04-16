@@ -42,7 +42,7 @@ struct ContentView: View {
 
     private var locationButtonColor: Color {
         switch locationButtonState {
-        case .ready:        return .blue
+        case .ready:        return Color(red: 0.0, green: 0.30, blue: 0.75)
         case .noFix:        return .red
         case .unauthorized: return .gray
         }
