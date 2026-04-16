@@ -20,5 +20,13 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 - Tapping instantly resets camera to Rome center (41.899159, 12.473065), span 0.027°
 - Button respects safe area (stays above home indicator)
 
-### FEAT-004: Re-center on GPS button
-A button overlaid on the map that re-centers the camera on the user's current location (if location permission has been granted and a fix is available).
+### ~~FEAT-004: Re-center on GPS button~~ ✓ Done 2026-04-16
+**Branch:** `feat/feat-004-recenter-gps`
+**AC met:**
+- Filled capsule button (location.fill SF Symbol + "My Location" label) overlaid bottom-right on the map
+- Blue when authorized + GPS fix available — tapping re-centers camera on user position
+- Red (location.slash.fill) when authorized but no fix — tapping shows "Waiting for GPS signal…" toast
+- Grey when unauthorized — tapping requests permission if not determined, or shows Settings alert if denied
+- Settings alert includes "Open Settings" deep link
+- Button state updates automatically as authorization and GPS fix change
+- distanceFilter set to 10m to avoid redundant updates
