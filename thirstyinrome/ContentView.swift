@@ -43,8 +43,8 @@ struct ContentView: View {
     private var locationButtonColor: Color {
         switch locationButtonState {
         case .ready:        return .blue
-        case .noFix:        return .red
-        case .unauthorized: return .gray
+        case .noFix:        return Color(red: 0.83, green: 0.18, blue: 0.18)
+        case .unauthorized: return Color(UIColor.systemGray)
         }
     }
 
@@ -93,8 +93,8 @@ struct ContentView: View {
             } label: {
                 Label("Rome", systemImage: "building.columns")
             }
-            .buttonStyle(.bordered)
-            .tint(.white)
+            .buttonStyle(.borderedProminent)
+            .tint(Color(red: 0.75, green: 0.22, blue: 0.17))
             .clipShape(.capsule)
             .shadow(radius: 4)
             .safeAreaPadding(.bottom)
@@ -106,9 +106,8 @@ struct ContentView: View {
             } label: {
                 Label("My Location", systemImage: locationButtonIcon)
             }
-            .buttonStyle(.bordered)
-            .tint(.white)
-            .foregroundStyle(locationButtonColor)
+            .buttonStyle(.borderedProminent)
+            .tint(locationButtonColor)
             .clipShape(.capsule)
             .shadow(radius: 4)
             .safeAreaPadding(.bottom)
