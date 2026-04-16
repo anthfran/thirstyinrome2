@@ -42,7 +42,7 @@ struct ContentView: View {
 
     private var locationButtonColor: Color {
         switch locationButtonState {
-        case .ready:        return Color(red: 0.0, green: 0.30, blue: 0.75)
+        case .ready:        return .blue
         case .noFix:        return .red
         case .unauthorized: return .gray
         }
@@ -107,7 +107,8 @@ struct ContentView: View {
                 Label("My Location", systemImage: locationButtonIcon)
             }
             .buttonStyle(.bordered)
-            .tint(locationButtonColor)
+            .tint(.white)
+            .foregroundStyle(locationButtonColor)
             .clipShape(.capsule)
             .shadow(radius: 4)
             .safeAreaPadding(.bottom)
