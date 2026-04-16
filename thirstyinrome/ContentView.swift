@@ -2,15 +2,21 @@ import SwiftUI
 import MapKit
 
 struct ContentView: View {
+    private static let romeCenter = CLLocationCoordinate2D(latitude: 41.899159, longitude: 12.473065)
+
     @Environment(PlaceViewModel.self) private var viewModel
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 41.899159, longitude: 12.473065),
+            center: ContentView.romeCenter,
             span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         )
     )
     @State private var hasJumpedToUserLocation = false
     @State private var mapSpan: Double = 0.01
+    private let romeRegion = MKCoordinateRegion(
+        center: ContentView.romeCenter,
+        span: MKCoordinateSpan(latitudeDelta: 0.027, longitudeDelta: 0.027)
+    )
 
     var body: some View {
         let result = viewModel.clusteringResult()
@@ -51,6 +57,19 @@ struct ContentView: View {
         }
         .mapStyle(.standard)
         .ignoresSafeArea()
+        .overlay(alignment: .bottomLeading) {
+            Button {
+                cameraPosition = .region(romeRegion)
+            } label: {
+                Label("Rome", systemImage: "building.columns")
+            }
+            .buttonStyle(.bordered)
+            .tint(.white)
+            .clipShape(.capsule)
+            .shadow(radius: 4)
+            .safeAreaPadding(.bottom)
+            .padding(.leading, 16)
+        }
         .onMapCameraChange(frequency: .onEnd) { context in
             mapSpan = context.region.span.latitudeDelta
         }
