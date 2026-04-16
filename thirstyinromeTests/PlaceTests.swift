@@ -1,5 +1,6 @@
 import Testing
 import Foundation
+import CoreLocation
 @testable import thirstyinrome
 
 struct PlaceTests {
@@ -29,5 +30,64 @@ struct PlaceTests {
     private func loadAllPlaces() throws -> [Place] {
         let url = try #require(Bundle.main.url(forResource: "Places", withExtension: "json"))
         return try JSONDecoder().decode([Place].self, from: Data(contentsOf: url))
+    }
+}
+
+struct ClusterTests {
+
+    // Two places in the same 0.008° cell → one cluster, no singles
+    @Test func testTwoPlacesInSameCellFormOneCluster() throws {
+        let vm = PlaceViewModel()
+        vm.places = [
+            Place(title: "A", lat: 41.900, lon: 12.470),
+            Place(title: "B", lat: 41.901, lon: 12.471)
+        ]
+        let clusters = vm.clusters()
+        let singles = vm.singlePlaces()
+        try #require(clusters.count == 1)
+        #expect(clusters[0].count == 2)
+        #expect(singles.isEmpty)
+    }
+
+    // Two places in different 0.008° cells → two singles, no clusters
+    @Test func testTwoPlacesInDifferentCellsAreEachSingles() {
+        let vm = PlaceViewModel()
+        vm.places = [
+            Place(title: "A", lat: 41.900, lon: 12.470),
+            Place(title: "B", lat: 41.950, lon: 12.520)
+        ]
+        let clusters = vm.clusters()
+        let singles = vm.singlePlaces()
+        #expect(clusters.isEmpty)
+        #expect(singles.count == 2)
+    }
+
+    // One place alone → not in clusters, appears in singlePlaces
+    @Test func testOnePlaceIsASingle() {
+        let vm = PlaceViewModel()
+        vm.places = [Place(title: "A", lat: 41.900, lon: 12.470)]
+        #expect(vm.clusters().isEmpty)
+        #expect(vm.singlePlaces().count == 1)
+    }
+
+    // Empty places → empty results
+    @Test func testEmptyPlacesReturnEmpty() {
+        let vm = PlaceViewModel()
+        vm.places = []
+        #expect(vm.clusters().isEmpty)
+        #expect(vm.singlePlaces().isEmpty)
+    }
+
+    // Cluster centroid is the average of its member coordinates
+    @Test func testClusterCentroidIsAverage() throws {
+        let vm = PlaceViewModel()
+        vm.places = [
+            Place(title: "A", lat: 41.900, lon: 12.470),
+            Place(title: "B", lat: 41.902, lon: 12.471)
+        ]
+        let clusters = vm.clusters()
+        try #require(clusters.count == 1)
+        #expect(abs(clusters[0].coordinate.latitude  - 41.901) < 0.0001)
+        #expect(abs(clusters[0].coordinate.longitude - 12.4705) < 0.0001)
     }
 }
