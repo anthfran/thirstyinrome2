@@ -145,9 +145,9 @@ struct LocationViewModelTests {
         let _ = vm.authorizationStatus
     }
 
-    @Test func authorizationStatusMatchesSystemAfterInit() {
-        let viewModel = PlaceViewModel()
-        #expect(viewModel.authorizationStatus == CLLocationManager().authorizationStatus)
+    @Test func testAuthorizationStatusMatchesSystemAfterInit() {
+        let vm = PlaceViewModel()
+        #expect(vm.authorizationStatus == CLLocationManager().authorizationStatus)
     }
 
     @Test func testLocationUnknownErrorNilsUserLocation() {
