@@ -15,6 +15,7 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
         super.init()
         loadPlaces()
         setupLocationManager()
+        authorizationStatus = locationManager.authorizationStatus
     }
 
     // MARK: - Private
