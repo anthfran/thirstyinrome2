@@ -52,6 +52,9 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 ### REFACTOR-004: ContentView is doing too much
 At 190 lines, `ContentView` handles map rendering, clustering branch logic, Rome button, GPS button state machine, toast, and settings alert. The GPS button and `handleLocationButtonTap` are a natural seam to extract into a `LocationButton` subview, making each unit easier to read and test independently.
 
+### REFACTOR-005: Remove dead test scaffolding
+Three Xcode-generated test files contain no assertions and slow down every test run. `testLaunchPerformance()` boots the simulator multiple times; `runsForEachTargetApplicationUIConfiguration = true` multiplies launches further. Fix: delete the three files and add `-skip-testing:thirstyinromeUITests` to the CLAUDE.md test command.
+
 ### ~~FEAT-004: Re-center on GPS button~~ ✓ Done 2026-04-16
 **Branch:** `feat/feat-004-recenter-gps`
 **AC met:**
