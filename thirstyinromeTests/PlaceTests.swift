@@ -107,6 +107,35 @@ struct ClusterTests {
         #expect(abs(clusters[0].coordinate.latitude  - 41.901) < 0.0001)
         #expect(abs(clusters[0].coordinate.longitude - 12.4705) < 0.0001)
     }
+
+    @Test func testClusterIdIsStableAcrossCalls() throws {
+        let vm = PlaceViewModel()
+        vm.places = [
+            Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
+            Place(id: "BBBBBBBB", title: "B", lat: 41.901, lon: 12.471)
+        ]
+        let first = vm.clusteringResult().clusters
+        let second = vm.clusteringResult().clusters
+        try #require(first.count == 1)
+        try #require(second.count == 1)
+        #expect(first[0].id == second[0].id)
+    }
+
+    @Test func testClusterIdIsDeterministic() throws {
+        let vm1 = PlaceViewModel()
+        vm1.places = [
+            Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
+            Place(id: "BBBBBBBB", title: "B", lat: 41.901, lon: 12.471)
+        ]
+        let vm2 = PlaceViewModel()
+        vm2.places = [
+            Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
+            Place(id: "BBBBBBBB", title: "B", lat: 41.901, lon: 12.471)
+        ]
+        let c1 = try #require(vm1.clusteringResult().clusters.first)
+        let c2 = try #require(vm2.clusteringResult().clusters.first)
+        #expect(c1.id == c2.id)
+    }
 }
 
 struct LocationViewModelTests {
