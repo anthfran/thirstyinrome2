@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9272CEB72F9097A0007C0D36 /* CLAUDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9272CEB62F9097A0007C0D36 /* CLAUDE.md */; };
 		9272CEB82F9097A0007C0D36 /* BACKLOG.md in Resources */ = {isa = PBXBuildFile; fileRef = 9272CEB52F9097A0007C0D36 /* BACKLOG.md */; };
+		9272CED42F917820007C0D36 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 9272CED32F917820007C0D36 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,7 @@
 		9272CE6A2F905FC1007C0D36 /* thirstyinromeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = thirstyinromeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9272CEB52F9097A0007C0D36 /* BACKLOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BACKLOG.md; sourceTree = "<group>"; };
 		9272CEB62F9097A0007C0D36 /* CLAUDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CLAUDE.md; sourceTree = "<group>"; };
+		9272CED32F917820007C0D36 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -82,6 +84,7 @@
 		9272CE4A2F905FBE007C0D36 = {
 			isa = PBXGroup;
 			children = (
+				9272CED32F917820007C0D36 /* README.md */,
 				9272CEB52F9097A0007C0D36 /* BACKLOG.md */,
 				9272CEB62F9097A0007C0D36 /* CLAUDE.md */,
 				9272CE552F905FBE007C0D36 /* thirstyinrome */,
@@ -222,6 +225,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9272CEB72F9097A0007C0D36 /* CLAUDE.md in Resources */,
+				9272CED42F917820007C0D36 /* README.md in Resources */,
 				9272CEB82F9097A0007C0D36 /* BACKLOG.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
