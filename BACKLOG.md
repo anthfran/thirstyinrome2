@@ -7,9 +7,6 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 
 ## Bugs
 
-### BUG-002: authorizationStatus initializes to .notDetermined regardless of actual status
-`PlaceViewModel.swift:9` — The property is declared as `.notDetermined` before `setupLocationManager()` runs. On second launch (where permission is already granted) the delegate fires synchronously when `locationManager.delegate = self` is set, so the window is tiny — but it is a latent bug. If timing ever shifts (e.g. background thread), the GPS button would briefly flash grey. Fix: initialize from `locationManager.authorizationStatus` directly in `init()` after calling `setupLocationManager()`.
-
 ### BUG-003: GPS wait toast timer leaks on rapid taps
 `ContentView.swift:158-160` — Each tap while in `.noFix` state queues a new `DispatchQueue.main.asyncAfter` closure. Rapid taps stack multiple deferred `showGPSWaitToast = false` calls. Harmless now but will cause subtle bugs if toast logic grows. Fix: use a `Task` stored in a `@State` variable, cancelling the previous one on each tap.
 
@@ -66,6 +63,13 @@ At 190 lines, `ContentView` handles map rendering, clustering branch logic, Rome
 **AC met:**
 - `Place.id` is a stable `String` decoded from `Places.json`, not a runtime `UUID()`
 - `CodingKeys` removed — all `Place` properties map directly to JSON keys
+
+### ~~BUG-002: authorizationStatus initializes to .notDetermined regardless of actual status~~ ✓ Done 2026-04-16
+**Branch:** `bug/bug-002-authorization-status-init`
+**AC met:**
+- `authorizationStatus` reflects the real `CLLocationManager` status immediately after `PlaceViewModel.init()` returns
+- No intermediate `.notDetermined` observable on second launch
+- Regression test `testAuthorizationStatusMatchesSystemAfterInit` documents the invariant
 
 ### ~~REFACTOR-005: Remove dead test scaffolding~~ ✓ Done 2026-04-16
 **Branch:** `refactor/refactor-005-remove-dead-tests`

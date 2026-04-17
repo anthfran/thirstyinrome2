@@ -145,6 +145,11 @@ struct LocationViewModelTests {
         let _ = vm.authorizationStatus
     }
 
+    @Test func testAuthorizationStatusMatchesSystemAfterInit() {
+        let vm = PlaceViewModel()
+        #expect(vm.authorizationStatus == CLLocationManager().authorizationStatus)
+    }
+
     @Test func testLocationUnknownErrorNilsUserLocation() {
         let vm = PlaceViewModel()
         vm.userLocation = CLLocation(latitude: 41.9, longitude: 12.5)
