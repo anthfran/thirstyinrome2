@@ -22,8 +22,12 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 
 ## Bugs
 
-### BUG-001: Cluster annotations recreated on every render
-`Cluster.swift:5` — `let id = UUID()` generates a new UUID each time `clusteringResult()` is called. Since `clusteringResult()` runs on every `body` render, SwiftUI's `ForEach` sees entirely new cluster IDs each time and tears down/recreates every annotation. Causes unnecessary view churn and prevents smooth transitions. Fix: derive a stable ID from the grid cell key (e.g. `"\(row)_\(col)"`) or the coordinate.
+### ~~BUG-001: Cluster annotations recreated on every render~~ ✓ Done 2026-04-16
+**Branch:** `bug/bug-001-refactor-003-stable-ids`
+**AC met:**
+- `Place.id` decoded from `Places.json` — stable across all decodes and app installs, suitable for cross-device reporting
+- `Cluster.id` derived from sorted member place IDs — same fountains always produce the same ID
+- No `UUID()` allocated at runtime for `Place` or `Cluster`
 
 ### BUG-002: authorizationStatus initializes to .notDetermined regardless of actual status
 `PlaceViewModel.swift:9` — The property is declared as `.notDetermined` before `setupLocationManager()` runs. On second launch (where permission is already granted) the delegate fires synchronously when `locationManager.delegate = self` is set, so the window is tiny — but it is a latent bug. If timing ever shifts (e.g. background thread), the GPS button would briefly flash grey. Fix: initialize from `locationManager.authorizationStatus` directly in `init()` after calling `setupLocationManager()`.
@@ -39,8 +43,11 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 ### REFACTOR-002: clusters() and singlePlaces() are test-only wrappers
 `PlaceViewModel.swift:108-114` — Both methods call `clusteringResult()` and discard half the result. Production code only uses `clusteringResult()`. Fix: remove them from production code and update the three tests that use them to call `clusteringResult()` directly.
 
-### REFACTOR-003: Place.id is non-stable across decodes
-`Place.swift:4` — `let id = UUID()` generates a new UUID on every decode. Currently safe because places decode once at init. If the dataset is ever refreshed or reloaded, all `Marker` views would be treated as new by SwiftUI's `ForEach`, causing full redraws. Fix: derive a stable ID from lat/lon (e.g. `"\(lat),\(lon)"`).
+### ~~REFACTOR-003: Place.id is non-stable across decodes~~ ✓ Done 2026-04-16
+**Branch:** `bug/bug-001-refactor-003-stable-ids`
+**AC met:**
+- `Place.id` is a stable `String` decoded from `Places.json`, not a runtime `UUID()`
+- `CodingKeys` removed — all `Place` properties map directly to JSON keys
 
 ### REFACTOR-004: ContentView is doing too much
 At 190 lines, `ContentView` handles map rendering, clustering branch logic, Rome button, GPS button state machine, toast, and settings alert. The GPS button and `handleLocationButtonTap` are a natural seam to extract into a `LocationButton` subview, making each unit easier to read and test independently.
