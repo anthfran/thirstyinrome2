@@ -15,18 +15,6 @@ Add `.xcstrings` localization for the top 25 countries by inbound Italian touris
 
 ---
 
-### FEAT-006: Migrate app identity from legacy repo
-Transfer the App Store app identity from `/Users/anthony/github/thirstyinrome-legacy/ThirstyInRome` into this repo so the new codebase can replace the existing App Store listing — including Bundle ID, app icon, entitlements, and any relevant build settings.
-
-**AC:**
-- Bundle ID matches the existing App Store listing's Bundle ID
-- App icon asset catalog migrated and renders correctly at all required sizes
-- All entitlements and capabilities from the legacy target are replicated in this project
-- Build succeeds and app can be archived and submitted to App Store Connect without creating a new listing
-- Legacy-specific dead code or assets not needed by this codebase are excluded
-
----
-
 ### FEAT-002: Navigate to fountain via Maps
 Tapping a fountain marker shows an action sheet or callout with options to open directions in Apple Maps or Google Maps (falling back to Apple Maps if Google Maps is not installed).
 
@@ -124,6 +112,17 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 - `thirstyinromeUITests/thirstyinromeUITestsLaunchTests.swift` deleted
 - CLAUDE.md "run all tests" command includes `-skip-testing:thirstyinromeUITests`
 - All unit tests in `PlaceTests.swift` pass
+
+### ~~FEAT-006: Migrate app identity from legacy repo~~
+✓ Done 2026-04-18 | Branch: feat/feat-006-migrate-app-identity | AC met
+Transfer the App Store app identity from `/Users/anthony/github/thirstyinrome-legacy/ThirstyInRome` into this repo so the new codebase can replace the existing App Store listing — including Bundle ID, app icon, entitlements, and any relevant build settings.
+
+**AC:**
+- Bundle ID matches the existing App Store listing's Bundle ID
+- App icon asset catalog migrated and renders correctly at all required sizes
+- All entitlements and capabilities from the legacy target are replicated in this project
+- Build succeeds and app can be archived and submitted to App Store Connect without creating a new listing
+- Legacy-specific dead code or assets not needed by this codebase are excluded
 
 ### ~~BUG-004: Cluster marker intercepts pinch-to-zoom gesture~~ ✓ Done 2026-04-18
 **Branch:** `fix/bug-004-cluster-pinch-gesture`
