@@ -7,23 +7,26 @@ private enum LocationButtonState {
 
 struct ContentView: View {
     private static let romeCenter = CLLocationCoordinate2D(latitude: 41.899159, longitude: 12.473065)
+    // Intentionally matches romeRegion span so clustering switches exactly when zoomed in enough to see individual markers
+    private static let clusteringThreshold: Double = 0.027
+    private static let zoomedInSpan: Double = 0.01
 
     @Environment(PlaceViewModel.self) private var viewModel
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
             center: ContentView.romeCenter,
-            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            span: MKCoordinateSpan(latitudeDelta: ContentView.zoomedInSpan, longitudeDelta: ContentView.zoomedInSpan)
         )
     )
     @State private var hasJumpedToUserLocation = false
-    @State private var mapSpan: Double = 0.01
+    @State private var mapSpan: Double = ContentView.zoomedInSpan
     @State private var showGPSWaitToast = false
     @State private var showSettingsAlert = false
     @State private var toastDismissTask: Task<Void, Never>?
 
     private let romeRegion = MKCoordinateRegion(
         center: ContentView.romeCenter,
-        span: MKCoordinateSpan(latitudeDelta: 0.027, longitudeDelta: 0.027)
+        span: MKCoordinateSpan(latitudeDelta: ContentView.clusteringThreshold, longitudeDelta: ContentView.clusteringThreshold)
     )
 
     private var locationButtonState: LocationButtonState {
@@ -52,7 +55,7 @@ struct ContentView: View {
     var body: some View {
         let result = viewModel.clusteringResult()
         Map(position: $cameraPosition) {
-            if mapSpan > 0.027 {
+            if mapSpan > ContentView.clusteringThreshold {
                 ForEach(result.clusters) { cluster in
                     Annotation("", coordinate: cluster.coordinate) {
                         Button {
@@ -141,7 +144,7 @@ struct ContentView: View {
             hasJumpedToUserLocation = true
             cameraPosition = .region(MKCoordinateRegion(
                 center: location.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                span: MKCoordinateSpan(latitudeDelta: ContentView.zoomedInSpan, longitudeDelta: ContentView.zoomedInSpan)
             ))
         }
     }
@@ -152,7 +155,7 @@ struct ContentView: View {
             guard let location = viewModel.userLocation else { return }
             cameraPosition = .region(MKCoordinateRegion(
                 center: location.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                span: MKCoordinateSpan(latitudeDelta: ContentView.zoomedInSpan, longitudeDelta: ContentView.zoomedInSpan)
             ))
         case .noFix:
             showGPSWaitToast = true
