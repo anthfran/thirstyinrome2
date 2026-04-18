@@ -23,22 +23,11 @@ xcodebuild test -project thirstyinrome.xcodeproj -scheme thirstyinrome -destinat
 
 Single-screen SwiftUI app (iOS 17+, Xcode 26). No navigation stack, no tabs.
 
-**Data flow:**
-- `thirstyinromeApp` creates one `PlaceViewModel` as `@State` and injects it via `.environment(viewModel)`
-- `ContentView` reads it with `@Environment(PlaceViewModel.self)` — this is the `@Observable` pattern, not `@EnvironmentObject`
-- `PlaceViewModel` loads `Places.json` synchronously in `init()` and owns all location state
-
-**`PlaceViewModel`** (`@Observable`, `NSObject`, `CLLocationManagerDelegate`):
-- Decodes `thirstyinrome/Places.json` from `Bundle.main` at init into `var places: [Place]`
-- Manages `CLLocationManager`: requests `whenInUse` auth only when status is `.notDetermined`, starts updates in the delegate callback after authorization
-- Exposes `var userLocation: CLLocation?` updated on each GPS fix
-
-**`ContentView`**:
-- Full-screen `Map(position: $cameraPosition)` with a `Marker` per fountain and `UserAnnotation()` for the GPS dot
-- Default camera: Rome center `(41.899159, 12.473065)`, span `0.01°`
-- On first non-nil `userLocation`, jumps camera once to user position; `hasJumpedToUserLocation` prevents subsequent GPS updates from overriding user panning
-
-**`Place`** — `Codable + Identifiable` struct with `title: String?`, `lat`, `lon`. `id = UUID()` is excluded from `CodingKeys` (no stable ID in the JSON). Two entries in the dataset have `nil` titles; these display as `"Fontanella"` on the map.
+Non-obvious design decisions:
+- `ContentView` uses `@Environment(PlaceViewModel.self)` — the `@Observable` pattern, **not** `@EnvironmentObject`
+- `hasJumpedToUserLocation` in `ContentView` fires the camera jump once on first GPS fix, then stops — subsequent location updates don't override user panning
+- `nil` place titles display as `"Fontanella"` on the map
+- The clustering threshold (`0.027°`) intentionally matches the Rome reset button's span so the view switches to individual markers exactly when zoomed in enough to see them cleanly
 
 ## Project Setup Notes
 
@@ -61,3 +50,4 @@ Planned features and bugs are tracked in `BACKLOG.md`. IDs follow the format `FE
 3. **Execute** — invoke `superpowers:subagent-driven-development` to implement the plan task-by-task with spec and quality review gates.
 4. **Finish** — invoke `superpowers:finishing-a-development-branch` to decide how to integrate the work.
 5. **Update backlog** — mark the item done (strikethrough + ✓ Done date + branch + AC met), then move it to the `## Completed` section at the bottom of `BACKLOG.md`.
+6. **Update CLAUDE.md** — if the item introduced non-obvious design decisions or changed ones already documented here, update the Architecture section.
