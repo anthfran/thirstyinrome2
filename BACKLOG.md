@@ -9,15 +9,20 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 
 ## Refactors
 
-### REFACTOR-002: clusters() and singlePlaces() are test-only wrappers
-`PlaceViewModel.swift:108-114` — Both methods call `clusteringResult()` and discard half the result. Production code only uses `clusteringResult()`. Fix: remove them from production code and update the three tests that use them to call `clusteringResult()` directly.
-
 ### REFACTOR-004: ContentView is doing too much
 At 190 lines, `ContentView` handles map rendering, clustering branch logic, Rome button, GPS button state machine, toast, and settings alert. The GPS button and `handleLocationButtonTap` are a natural seam to extract into a `LocationButton` subview, making each unit easier to read and test independently.
 
 ---
 
 ## Completed
+
+### ~~REFACTOR-002: clusters() and singlePlaces() are test-only wrappers~~ ✓ Done 2026-04-17
+**Branch:** `refactor/refactor-002-remove-test-wrappers`
+**AC met:**
+- `clusters()` and `singlePlaces()` removed from `PlaceViewModel`
+- 5 tests updated to call `clusteringResult()` once per test, binding `result.clusters` / `result.singles`
+- No `clusters(` or `singlePlaces(` remain outside docs/history
+- All tests pass
 
 ### ~~REFACTOR-001: Magic numbers not shared between files~~ ✓ Done 2026-04-17
 **Branch:** `refactor/refactor-001-named-constants`
