@@ -59,11 +59,10 @@ struct ClusterTests {
             Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
             Place(id: "BBBBBBBB", title: "B", lat: 41.901, lon: 12.471)
         ]
-        let clusters = vm.clusters()
-        let singles = vm.singlePlaces()
-        try #require(clusters.count == 1)
-        #expect(clusters[0].count == 2)
-        #expect(singles.isEmpty)
+        let result = vm.clusteringResult()
+        try #require(result.clusters.count == 1)
+        #expect(result.clusters[0].count == 2)
+        #expect(result.singles.isEmpty)
     }
 
     // Two places in different 0.008° cells → two singles, no clusters
@@ -73,26 +72,27 @@ struct ClusterTests {
             Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
             Place(id: "BBBBBBBB", title: "B", lat: 41.950, lon: 12.520)
         ]
-        let clusters = vm.clusters()
-        let singles = vm.singlePlaces()
-        #expect(clusters.isEmpty)
-        #expect(singles.count == 2)
+        let result = vm.clusteringResult()
+        #expect(result.clusters.isEmpty)
+        #expect(result.singles.count == 2)
     }
 
     // One place alone → not in clusters, appears in singlePlaces
     @Test func testOnePlaceIsASingle() {
         let vm = PlaceViewModel()
         vm.places = [Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470)]
-        #expect(vm.clusters().isEmpty)
-        #expect(vm.singlePlaces().count == 1)
+        let result = vm.clusteringResult()
+        #expect(result.clusters.isEmpty)
+        #expect(result.singles.count == 1)
     }
 
     // Empty places → empty results
     @Test func testEmptyPlacesReturnEmpty() {
         let vm = PlaceViewModel()
         vm.places = []
-        #expect(vm.clusters().isEmpty)
-        #expect(vm.singlePlaces().isEmpty)
+        let result = vm.clusteringResult()
+        #expect(result.clusters.isEmpty)
+        #expect(result.singles.isEmpty)
     }
 
     // Cluster centroid is the average of its member coordinates
@@ -102,10 +102,10 @@ struct ClusterTests {
             Place(id: "AAAAAAAA", title: "A", lat: 41.900, lon: 12.470),
             Place(id: "BBBBBBBB", title: "B", lat: 41.902, lon: 12.471)
         ]
-        let clusters = vm.clusters()
-        try #require(clusters.count == 1)
-        #expect(abs(clusters[0].coordinate.latitude  - 41.901) < 0.0001)
-        #expect(abs(clusters[0].coordinate.longitude - 12.4705) < 0.0001)
+        let result = vm.clusteringResult()
+        try #require(result.clusters.count == 1)
+        #expect(abs(result.clusters[0].coordinate.latitude  - 41.901) < 0.0001)
+        #expect(abs(result.clusters[0].coordinate.longitude - 12.4705) < 0.0001)
     }
 
     @Test func testClusterIdIsStableAcrossCalls() throws {
