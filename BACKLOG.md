@@ -7,9 +7,6 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 
 ## Bugs
 
-### BUG-003: GPS wait toast timer leaks on rapid taps
-`ContentView.swift:158-160` — Each tap while in `.noFix` state queues a new `DispatchQueue.main.asyncAfter` closure. Rapid taps stack multiple deferred `showGPSWaitToast = false` calls. Harmless now but will cause subtle bugs if toast logic grows. Fix: use a `Task` stored in a `@State` variable, cancelling the previous one on each tap.
-
 ## Refactors
 
 ### REFACTOR-001: Magic numbers not shared between files
@@ -24,6 +21,14 @@ At 190 lines, `ContentView` handles map rendering, clustering branch logic, Rome
 ---
 
 ## Completed
+
+### ~~BUG-003: GPS wait toast timer leaks on rapid taps~~ ✓ Done 2026-04-17
+**Branch:** `bug/bug-003-toast-timer-leak`
+**AC met:**
+- No `DispatchQueue.main.asyncAfter` in `handleLocationButtonTap`
+- `toastDismissTask` is a `@State Task<Void, Never>?` on `ContentView`
+- Rapid taps result in a single dismiss 2 seconds after the last tap
+- All existing tests pass
 
 ### ~~FEAT-001: Marker clustering when zoomed out~~ ✓ Done 2026-04-16
 **Branch:** `feat/feat-001-marker-clustering`

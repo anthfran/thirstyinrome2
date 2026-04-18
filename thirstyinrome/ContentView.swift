@@ -19,6 +19,7 @@ struct ContentView: View {
     @State private var mapSpan: Double = 0.01
     @State private var showGPSWaitToast = false
     @State private var showSettingsAlert = false
+    @State private var toastDismissTask: Task<Void, Never>?
 
     private let romeRegion = MKCoordinateRegion(
         center: ContentView.romeCenter,
@@ -155,8 +156,12 @@ struct ContentView: View {
             ))
         case .noFix:
             showGPSWaitToast = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                showGPSWaitToast = false
+            toastDismissTask?.cancel()
+            toastDismissTask = Task {
+                do {
+                    try await Task.sleep(for: .seconds(2))
+                    showGPSWaitToast = false
+                } catch {}
             }
         case .unauthorized:
             switch viewModel.authorizationStatus {
