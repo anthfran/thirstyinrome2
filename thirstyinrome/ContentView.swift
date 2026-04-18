@@ -28,19 +28,17 @@ struct ContentView: View {
             if mapSpan > ContentView.clusteringThreshold {
                 ForEach(result.clusters) { cluster in
                     Annotation("", coordinate: cluster.coordinate) {
-                        Button {
-                            zoomToCluster(cluster)
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(.blue)
-                                    .frame(width: 36, height: 36)
-                                Text("\(cluster.count)")
-                                    .foregroundStyle(.white)
-                                    .font(.system(size: 14, weight: .bold))
-                            }
+                        ZStack {
+                            Circle()
+                                .fill(.blue)
+                                .frame(width: 36, height: 36)
+                            Text("\(cluster.count)")
+                                .foregroundStyle(.white)
+                                .font(.system(size: 14, weight: .bold))
                         }
-                        .buttonStyle(.plain)
+                        .onTapGesture {
+                            zoomToCluster(cluster)
+                        }
                     }
                 }
                 ForEach(result.singles) { place in
