@@ -2,10 +2,43 @@
 
 ## Features
 
+### FEAT-005: Localize UI for top 25 tourist countries to Italy
+Add `.xcstrings` localization for the top 25 countries by inbound Italian tourism. All visible strings (button labels, toast messages, alert text, map callouts) are externalized and translated.
+
+**Locales:** English, Italian, German, French, Spanish, Portuguese (Brazil), Japanese, Chinese (Simplified), Chinese (Traditional), Dutch, Polish, Russian, Korean, Swedish, Danish, Norwegian, Czech, Hungarian, Romanian, Finnish, Arabic, Turkish, Greek, Croatian, Slovak.
+
+**AC:**
+- All user-visible strings live in a Strings Catalog (`Localizable.xcstrings`), not hardcoded in Swift files
+- All 25 locales have translations (machine translation acceptable for initial pass)
+- Device locale automatically selects the correct language; English is the fallback
+- Build succeeds and all existing tests pass
+
+---
+
+### FEAT-006: Migrate app identity from legacy repo
+Transfer the App Store app identity from `/Users/anthony/github/thirstyinrome-legacy/ThirstyInRome` into this repo so the new codebase can replace the existing App Store listing — including Bundle ID, app icon, entitlements, and any relevant build settings.
+
+**AC:**
+- Bundle ID matches the existing App Store listing's Bundle ID
+- App icon asset catalog migrated and renders correctly at all required sizes
+- All entitlements and capabilities from the legacy target are replicated in this project
+- Build succeeds and app can be archived and submitted to App Store Connect without creating a new listing
+- Legacy-specific dead code or assets not needed by this codebase are excluded
+
+---
+
 ### FEAT-002: Navigate to fountain via Maps
 Tapping a fountain marker shows an action sheet or callout with options to open directions in Apple Maps or Google Maps (falling back to Apple Maps if Google Maps is not installed).
 
 ## Bugs
+
+### BUG-004: Cluster marker intercepts pinch-to-zoom gesture
+When one finger of a two-finger pinch lands on a cluster annotation, the cluster tap handler fires instead of the zoom gesture being recognized, leaving the map unresponsive to the pinch.
+
+**AC:**
+- Pinch-to-zoom succeeds regardless of whether a finger starts on a cluster annotation
+- Single-finger tap on a cluster still zooms the camera to the cluster's bounding region
+- No regression on individual fountain marker tap behavior
 
 ## Refactors
 
