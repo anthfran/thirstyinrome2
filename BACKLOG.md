@@ -9,9 +9,6 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 
 ## Refactors
 
-### REFACTOR-001: Magic numbers not shared between files
-`0.027` (clustering/zoom threshold) and `0.01` (default camera span) appear hardcoded in multiple places across `ContentView.swift` and `PlaceViewModel.swift`. A change to the clustering threshold requires hunting down every occurrence. Fix: define named constants in a shared location (e.g. a `Constants` enum or as `static let` on `PlaceViewModel`).
-
 ### REFACTOR-002: clusters() and singlePlaces() are test-only wrappers
 `PlaceViewModel.swift:108-114` — Both methods call `clusteringResult()` and discard half the result. Production code only uses `clusteringResult()`. Fix: remove them from production code and update the three tests that use them to call `clusteringResult()` directly.
 
@@ -21,6 +18,13 @@ At 190 lines, `ContentView` handles map rendering, clustering branch logic, Rome
 ---
 
 ## Completed
+
+### ~~REFACTOR-001: Magic numbers not shared between files~~ ✓ Done 2026-04-17
+**Branch:** `refactor/refactor-001-named-constants`
+**AC met:**
+- `clusteringThreshold` and `zoomedInSpan` defined as `private static let` on `ContentView`
+- No bare `0.027` or `0.01` literals remain outside the constant definitions
+- Build succeeds
 
 ### ~~BUG-003: GPS wait toast timer leaks on rapid taps~~ ✓ Done 2026-04-17
 **Branch:** `bug/bug-003-toast-timer-leak`
