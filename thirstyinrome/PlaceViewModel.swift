@@ -106,11 +106,4 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
         return (clusters, singles)
     }
 
-    func clusters(gridSize: Double = defaultGridSize) -> [Cluster] {
-        clusteringResult(gridSize: gridSize).clusters
-    }
-
-    func singlePlaces(gridSize: Double = defaultGridSize) -> [Place] {
-        clusteringResult(gridSize: gridSize).singles
-    }
 }
