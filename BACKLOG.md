@@ -9,12 +9,17 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 
 ## Refactors
 
-### REFACTOR-004: ContentView is doing too much
-At 190 lines, `ContentView` handles map rendering, clustering branch logic, Rome button, GPS button state machine, toast, and settings alert. The GPS button and `handleLocationButtonTap` are a natural seam to extract into a `LocationButton` subview, making each unit easier to read and test independently.
-
 ---
 
 ## Completed
+
+### ~~REFACTOR-004: ContentView is doing too much~~ ✓ Done 2026-04-17
+**Branch:** `main`
+**AC met:**
+- `LocationButtonState` enum lives in `LocationButton.swift`, not `ContentView.swift`
+- `ContentView` contains no GPS-specific state vars, computed props, or methods
+- GPS button, toast, and settings alert behavior unchanged (toast now appears above GPS button in bottom-trailing area)
+- Build succeeds and all existing tests pass
 
 ### ~~REFACTOR-002: clusters() and singlePlaces() are test-only wrappers~~ ✓ Done 2026-04-17
 **Branch:** `refactor/refactor-002-remove-test-wrappers`
