@@ -32,13 +32,6 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 
 ## Bugs
 
-### BUG-004: Cluster marker intercepts pinch-to-zoom gesture
-When one finger of a two-finger pinch lands on a cluster annotation, the cluster tap handler fires instead of the zoom gesture being recognized, leaving the map unresponsive to the pinch.
-
-**AC:**
-- Pinch-to-zoom succeeds regardless of whether a finger starts on a cluster annotation
-- Single-finger tap on a cluster still zooms the camera to the cluster's bounding region
-- No regression on individual fountain marker tap behavior
 
 ## Refactors
 
@@ -131,3 +124,10 @@ When one finger of a two-finger pinch lands on a cluster annotation, the cluster
 - `thirstyinromeUITests/thirstyinromeUITestsLaunchTests.swift` deleted
 - CLAUDE.md "run all tests" command includes `-skip-testing:thirstyinromeUITests`
 - All unit tests in `PlaceTests.swift` pass
+
+### ~~BUG-004: Cluster marker intercepts pinch-to-zoom gesture~~ ✓ Done 2026-04-18
+**Branch:** `fix/bug-004-cluster-pinch-gesture`
+**AC met:**
+- Pinch-to-zoom succeeds regardless of whether a finger starts on a cluster annotation
+- Single-finger tap on a cluster still zooms the camera to the cluster's bounding region
+- No regression on individual fountain marker tap behavior
