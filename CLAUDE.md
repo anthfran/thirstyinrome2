@@ -28,6 +28,7 @@ Non-obvious design decisions:
 - `hasJumpedToUserLocation` in `ContentView` fires the camera jump once on first GPS fix, then stops — subsequent location updates don't override user panning
 - `nil` place titles display as `"Fontanella"` on the map
 - The clustering threshold (`0.027°`) intentionally matches the Rome reset button's span so the view switches to individual markers exactly when zoomed in enough to see them cleanly
+- `LocationButton` is a self-contained subview that owns all GPS state (`showGPSWaitToast`, `showSettingsAlert`, `toastDismissTask`). It receives an `onCenterOnUser: (CLLocation) -> Void` callback from `ContentView` to move the camera — it never holds a reference to `cameraPosition`.
 
 ## Project Setup Notes
 
