@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var hasJumpedToUserLocation = false
     @State private var mapSpan: Double = ContentView.zoomedInSpan
     @State private var selectedPlaceID: String?
+    @State private var selectedPlace: Place?
 
     private let romeRegion = MKCoordinateRegion(
         center: ContentView.romeCenter,
@@ -92,23 +93,11 @@ struct ContentView: View {
         .onMapCameraChange(frequency: .onEnd) { context in
             mapSpan = context.region.span.latitudeDelta
         }
-        .confirmationDialog(
-            "Get Directions",
-            // confirmationDialog requires Bool; derive from selectedPlaceID being non-nil
-            isPresented: Binding(
-                get: { selectedPlaceID != nil },
-                set: { if !$0 { selectedPlaceID = nil } }
-            ),
-            titleVisibility: .visible
-        ) {
-            if let id = selectedPlaceID,
-               let place = viewModel.places.first(where: { $0.id == id }) {
-                Button("Apple Maps") { openAppleMaps(for: place) }
-                if canOpenGoogleMaps() {
-                    Button("Google Maps") { openGoogleMaps(for: place) }
-                }
-            }
-            Button("Cancel", role: .cancel) { selectedPlaceID = nil }
+        .onChange(of: selectedPlaceID) { _, newID in
+            selectedPlace = newID.flatMap { id in viewModel.places.first { $0.id == id } }
+        }
+        .sheet(item: $selectedPlace, onDismiss: { selectedPlaceID = nil }) { place in
+            FountainSheet(place: place)
         }
         .onChange(of: viewModel.userLocation) { _, newLocation in
             guard !hasJumpedToUserLocation, let location = newLocation else { return }
@@ -135,23 +124,6 @@ struct ContentView: View {
         ))
     }
 
-    private func canOpenGoogleMaps() -> Bool {
-        guard let url = URL(string: "comgooglemaps://") else { return false }
-        return UIApplication.shared.canOpenURL(url)
-    }
-
-    private func openAppleMaps(for place: Place) {
-        let coordinate = CLLocationCoordinate2D(latitude: place.lat, longitude: place.lon)
-        let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
-        mapItem.name = place.title ?? "Fontanella"
-        mapItem.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
-    }
-
-    private func openGoogleMaps(for place: Place) {
-        let daddr = String(format: "%.6f,%.6f", place.lat, place.lon)
-        guard let url = URL(string: "comgooglemaps://?daddr=\(daddr)&directionsmode=walking") else { return }
-        UIApplication.shared.open(url)
-    }
 }
 
 #Preview {
