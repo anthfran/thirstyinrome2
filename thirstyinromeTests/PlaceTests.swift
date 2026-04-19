@@ -167,11 +167,11 @@ struct LocationViewModelTests {
 
 struct LocalizationTests {
 
+    // Xcode compiles .xcstrings into per-locale .strings binary plists in the app bundle.
+    // The source .xcstrings file is not present at runtime — verify via a compiled lproj.
     @Test func testLocalizableCatalogContainsExpectedKeys() throws {
-        let url = try #require(Bundle.main.url(forResource: "Localizable", withExtension: "xcstrings"))
-        let data = try Data(contentsOf: url)
-        let json = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
-        let strings = try #require(json["strings"] as? [String: Any])
+        let path = try #require(Bundle.main.path(forResource: "Localizable", ofType: "strings", inDirectory: "it.lproj"))
+        let strings = try #require(NSDictionary(contentsOfFile: path))
         #expect(strings["Rome"] != nil)
         #expect(strings["My Location"] != nil)
         #expect(strings["Cancel"] != nil)
@@ -183,5 +183,15 @@ struct LocalizationTests {
         #expect(strings["Zooms to this cluster"] != nil)
         #expect(strings["Waiting for GPS signal\u{2026}"] != nil)
         #expect(strings["To re-center on your position, enable Location in Settings."] != nil)
+    }
+
+    @Test func testAllExpectedLocalesPresent() {
+        let bundleLocales = Set(Bundle.main.localizations)
+        let expected = ["en", "it", "de", "fr", "es", "pt-BR", "ja", "zh-Hans", "zh-Hant",
+                        "nl", "pl", "ru", "ko", "sv", "da", "nb", "cs", "hu", "ro", "fi",
+                        "ar", "tr", "el", "hr", "sk"]
+        for locale in expected {
+            #expect(bundleLocales.contains(locale), "Bundle missing locale: \(locale)")
+        }
     }
 }
