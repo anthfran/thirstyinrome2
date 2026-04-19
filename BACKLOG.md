@@ -15,8 +15,18 @@ Add `.xcstrings` localization for the top 25 countries by inbound Italian touris
 
 ---
 
-### FEAT-002: Navigate to fountain via Maps
-Tapping a fountain marker shows an action sheet or callout with options to open directions in Apple Maps or Google Maps (falling back to Apple Maps if Google Maps is not installed).
+### FEAT-007: Compass/heading map mode
+A toggle button lets the user switch between north-up (default) and heading-up mode. In heading-up mode the map rotates to keep the device's compass direction at the top, and the user location dot gains a heading cone to show which way the device is pointing.
+
+**AC:**
+- A compass/heading toggle button appears on the map (e.g. compass rose SF Symbol)
+- Tapping the button enters heading-up mode: map pitch follows `CLLocationManager` heading updates
+- The user location blue dot shows a directional cone (bearing wedge) in heading-up mode
+- Tapping the button again returns to north-up mode and removes the cone
+- Heading updates do not interfere with user panning or the existing Rome/GPS re-center buttons
+- Build succeeds and all existing tests pass
+
+---
 
 ## Bugs
 
@@ -26,6 +36,16 @@ Tapping a fountain marker shows an action sheet or callout with options to open 
 ---
 
 ## Completed
+
+### ~~FEAT-002: Navigate to fountain via Maps~~ ✓ Done 2026-04-18
+**Branch:** `feat/feat-002-maps-navigation`
+**AC met:**
+- Tapping a fountain marker opens a compact bottom sheet (~220pt) with the fountain name (or "Fontanella"), "Open in Apple Maps", and "Open in Google Maps" buttons
+- Both buttons always shown; both open walking directions to the fountain and dismiss the sheet
+- X close button and swipe-to-dismiss both work and deselect the marker
+- Tapping the map background closes the sheet
+- Cluster tap behavior unchanged — no sheet appears
+- Build succeeds and all existing tests pass
 
 ### ~~REFACTOR-004: ContentView is doing too much~~ ✓ Done 2026-04-17
 **Branch:** `main`
