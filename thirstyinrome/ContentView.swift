@@ -94,6 +94,7 @@ struct ContentView: View {
         }
         .confirmationDialog(
             "Get Directions",
+            // confirmationDialog requires Bool; derive from selectedPlaceID being non-nil
             isPresented: Binding(
                 get: { selectedPlaceID != nil },
                 set: { if !$0 { selectedPlaceID = nil } }
