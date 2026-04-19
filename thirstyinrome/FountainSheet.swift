@@ -48,6 +48,7 @@ struct FountainSheet: View {
         }
         .padding(.top)
         .presentationDetents([.height(220)])
+        .presentationDragIndicator(.visible)
     }
 
     private func openAppleMaps() {
