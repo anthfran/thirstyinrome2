@@ -148,7 +148,8 @@ struct ContentView: View {
     }
 
     private func openGoogleMaps(for place: Place) {
-        guard let url = URL(string: "comgooglemaps://?daddr=\(place.lat),\(place.lon)&directionsmode=walking") else { return }
+        let daddr = String(format: "%.6f,%.6f", place.lat, place.lon)
+        guard let url = URL(string: "comgooglemaps://?daddr=\(daddr)&directionsmode=walking") else { return }
         UIApplication.shared.open(url)
     }
 }
