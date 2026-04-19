@@ -92,6 +92,23 @@ struct ContentView: View {
         .onMapCameraChange(frequency: .onEnd) { context in
             mapSpan = context.region.span.latitudeDelta
         }
+        .confirmationDialog(
+            "Get Directions",
+            isPresented: Binding(
+                get: { selectedPlaceID != nil },
+                set: { if !$0 { selectedPlaceID = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            if let id = selectedPlaceID,
+               let place = viewModel.places.first(where: { $0.id == id }) {
+                Button("Apple Maps") { openAppleMaps(for: place) }
+                if canOpenGoogleMaps() {
+                    Button("Google Maps") { openGoogleMaps(for: place) }
+                }
+            }
+            Button("Cancel", role: .cancel) { selectedPlaceID = nil }
+        }
         .onChange(of: viewModel.userLocation) { _, newLocation in
             guard !hasJumpedToUserLocation, let location = newLocation else { return }
             hasJumpedToUserLocation = true
@@ -115,6 +132,23 @@ struct ContentView: View {
             center: cluster.coordinate,
             span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
         ))
+    }
+
+    private func canOpenGoogleMaps() -> Bool {
+        guard let url = URL(string: "comgooglemaps://") else { return false }
+        return UIApplication.shared.canOpenURL(url)
+    }
+
+    private func openAppleMaps(for place: Place) {
+        let coordinate = CLLocationCoordinate2D(latitude: place.lat, longitude: place.lon)
+        let mapItem = MKMapItem(placemark: MKPlacemark(coordinate: coordinate))
+        mapItem.name = place.title ?? "Fontanella"
+        mapItem.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
+    }
+
+    private func openGoogleMaps(for place: Place) {
+        guard let url = URL(string: "comgooglemaps://?daddr=\(place.lat),\(place.lon)&directionsmode=walking") else { return }
+        UIApplication.shared.open(url)
     }
 }
 
