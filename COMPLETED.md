@@ -1,5 +1,14 @@
 # Completed
 
+### ~~FEAT-008: Two-tone splash screen background~~ ✓ Done 2026-04-19
+**Branch:** `feat/feat-008-two-tone-splash`
+**AC met:**
+- `LaunchScreen.storyboard` background replaced with two `UIView` subviews — left half sRGB(133,25,27), right half sRGB(248,156,23)
+- The vertical split falls exactly at the horizontal midpoint on all device sizes (Auto Layout `multiplier="0.5"`)
+- Colors are non-adaptive — identical in both light and dark mode (explicit sRGB floats, no system color references)
+- Existing centered `LaunchIcon` image remains centered over both halves
+- Build succeeds and all existing tests pass
+
 ### ~~FEAT-002: Navigate to fountain via Maps~~ ✓ Done 2026-04-18
 **Branch:** `feat/feat-002-maps-navigation`
 **AC met:**
