@@ -42,7 +42,7 @@ struct ContentView: View {
                             zoomToCluster(cluster)
                         }
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Cluster of \(cluster.count) fountains")
+                        .accessibilityLabel(Text("Cluster of \(cluster.count) fountains"))
                         .accessibilityAddTraits(.isButton)
                         .accessibilityHint("Zooms to this cluster")
                     }

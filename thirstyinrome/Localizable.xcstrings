@@ -85,7 +85,7 @@
         "sv" : { "stringUnit" : { "state" : "translated", "value" : "Platsåtkomst krävs" } },
         "tr" : { "stringUnit" : { "state" : "translated", "value" : "Konum Erişimi Gerekli" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "需要位置访问权限" } },
-        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "需要位置存取权限" } }
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "需要位置存取權限" } }
       }
     },
     "My Location" : {
