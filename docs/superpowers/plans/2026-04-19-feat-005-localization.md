@@ -1,0 +1,428 @@
+# FEAT-005: Localization Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Add a `Localizable.xcstrings` String Catalog covering 11 UI strings across 25 locales, with no Swift source changes required.
+
+**Architecture:** SwiftUI's `Text("…")` and `Label("…")` already use `LocalizedStringKey`, so they look up the catalog automatically. Only one new file is created — `thirstyinrome/Localizable.xcstrings` — which is auto-included by the project's File System Synchronized Groups. The cluster count accessibility label uses a `%lld` format key; clusters always have ≥2 members so the singular form is never needed.
+
+**Tech Stack:** Swift Testing, SwiftUI, Xcode String Catalog (`.xcstrings` JSON format)
+
+---
+
+### Task 1: Create feature branch
+
+**Files:** none
+
+- [ ] **Step 1: Create and switch to the feature branch**
+
+```bash
+git checkout -b feat/feat-005-localization
+```
+
+Expected: `Switched to a new branch 'feat/feat-005-localization'`
+
+---
+
+### Task 2: Write failing localization smoke test
+
+**Files:**
+- Modify: `thirstyinromeTests/PlaceTests.swift`
+
+- [ ] **Step 1: Add the test struct and test to PlaceTests.swift**
+
+Add this at the end of `thirstyinromeTests/PlaceTests.swift`, after the closing brace of `LocationViewModelTests`:
+
+```swift
+struct LocalizationTests {
+
+    @Test func testLocalizableCatalogContainsExpectedKeys() throws {
+        let url = try #require(Bundle.main.url(forResource: "Localizable", withExtension: "xcstrings"))
+        let data = try Data(contentsOf: url)
+        let json = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let strings = try #require(json["strings"] as? [String: Any])
+        #expect(strings["Rome"] != nil)
+        #expect(strings["My Location"] != nil)
+        #expect(strings["Cancel"] != nil)
+        #expect(strings["Cluster of %lld fountains"] != nil)
+        #expect(strings["Open in Apple Maps"] != nil)
+    }
+}
+```
+
+- [ ] **Step 2: Run the test to verify it fails**
+
+```bash
+xcodebuild test -project thirstyinrome.xcodeproj -scheme thirstyinrome -destination 'platform=iOS Simulator,OS=latest,name=iPhone 17' -only-testing:thirstyinromeTests/LocalizationTests/testLocalizableCatalogContainsExpectedKeys 2>&1 | grep -E "error:|warning:|Test Suite|Test Case|PASSED|FAILED|BUILD SUCCEEDED|BUILD FAILED|TEST SUCCEEDED|TEST FAILED"
+```
+
+Expected: test FAILED (no `Localizable.xcstrings` resource found in bundle yet)
+
+- [ ] **Step 3: Commit the failing test**
+
+```bash
+git add thirstyinromeTests/PlaceTests.swift
+git commit -m "test: failing localization smoke test (FEAT-005)"
+```
+
+---
+
+### Task 3: Create Localizable.xcstrings with all 25 locale translations
+
+**Files:**
+- Create: `thirstyinrome/Localizable.xcstrings`
+
+- [ ] **Step 1: Create the String Catalog file**
+
+Create `thirstyinrome/Localizable.xcstrings` with the following content (valid JSON, Xcode String Catalog format):
+
+```json
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Cancel" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "إلغاء" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Zrušit" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Annuller" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Abbrechen" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Ακύρωση" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cancelar" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Peruuta" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Annuler" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Odustani" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Mégse" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Annulla" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "キャンセル" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "취소" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Avbryt" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Annuleer" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Anuluj" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Cancelar" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Anulează" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Отмена" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Zrušiť" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Avbryt" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "İptal" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "取消" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "取消" } }
+      }
+    },
+    "Cluster of %lld fountains" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مجموعة من %lld نافورة" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Shluk %lld fontán" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Klynge med %lld springvand" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Gruppe von %lld Brunnen" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Ομάδα %lld συντριβανιών" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cluster of %lld fountains" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Grupo de %lld fuentes" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "%lld suihkulähteen ryhmä" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Groupe de %lld fontaines" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Skupina od %lld fontana" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "%lld szökőkút csoportja" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Gruppo di %lld fontanelle" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "%lld か所の噴水グループ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "분수 %lld개 클러스터" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Klynge med %lld fontener" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Cluster van %lld fonteinen" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Skupisko %lld fontann" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Grupo de %lld fontes" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Grup de %lld fântâni" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Группа из %lld фонтанов" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Skupina %lld fontán" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Kluster med %lld brunnar" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "%lld çeşme kümesi" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "%lld 个喷泉群" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "%lld 個噴泉群" } }
+      }
+    },
+    "Location Access Required" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "مطلوب الوصول إلى الموقع" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Vyžadován přístup k poloze" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Placeringsadgang påkrævet" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Standortzugriff erforderlich" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Απαιτείται πρόσβαση τοποθεσίας" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Location Access Required" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Acceso a la ubicación requerido" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Sijaintikäyttöoikeus vaaditaan" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Accès à la localisation requis" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Potreban pristup lokaciji" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Helyzet-hozzáférés szükséges" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Accesso alla posizione richiesto" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "位置情報へのアクセスが必要です" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "위치 접근 권한 필요" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Stedstilgang kreves" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Toegang tot locatie vereist" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wymagany dostęp do lokalizacji" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Acesso à localização necessário" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Acces la locație necesar" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Требуется доступ к геопозиции" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Vyžaduje sa prístup k polohe" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Platsåtkomst krävs" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Konum Erişimi Gerekli" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "需要位置访问权限" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "需要位置存取權限" } }
+      }
+    },
+    "My Location" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "موقعي" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Moje poloha" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Min placering" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Mein Standort" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Η θέση μου" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "My Location" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mi ubicación" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Oma sijainti" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ma position" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Moja lokacija" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Saját helyzet" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "La mia posizione" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "現在地" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "내 위치" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Min plassering" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Mijn locatie" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Moja lokalizacja" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Minha localização" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Locația mea" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Моё местоположение" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Moja poloha" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Min plats" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Konumum" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "我的位置" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "我的位置" } }
+      }
+    },
+    "Open in Apple Maps" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فتح في خرائط Apple" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít v Apple Maps" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Åbn i Kort" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "In Apple Maps öffnen" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Άνοιγμα στους Χάρτες Apple" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open in Apple Maps" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir en Mapas" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Avaa Kartassa" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir dans Plans" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Otvori u Apple kartama" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Megnyitás Apple Térképekben" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Apri in Apple Maps" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "マップで開く" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Apple 지도에서 열기" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Åpne i Kart" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Openen in Kaarten" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Otwórz w Apple Maps" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Abrir no Apple Maps" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Deschide în Apple Maps" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Открыть в картах Apple" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Otvoriť v Apple Maps" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Öppna i Kartor" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Apple Haritalar'da Aç" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在地图中打开" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "在地圖中打開" } }
+      }
+    },
+    "Open in Google Maps" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فتح في خرائط Google" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít v Google Maps" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Åbn i Google Maps" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "In Google Maps öffnen" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Άνοιγμα στο Google Maps" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open in Google Maps" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir en Google Maps" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Avaa Google Mapsissa" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir dans Google Maps" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Otvori u Google kartama" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Megnyitás Google Térképekben" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Apri in Google Maps" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "Google マップで開く" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "Google 지도에서 열기" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Åpne i Google Maps" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Openen in Google Maps" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Otwórz w Google Maps" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Abrir no Google Maps" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Deschide în Google Maps" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Открыть в Google Картах" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Otvoriť v Google Maps" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Öppna i Google Maps" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Google Haritalar'da Aç" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "在Google地图中打开" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "在Google地圖中打開" } }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "فتح الإعدادات" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Otevřít nastavení" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Åbn indstillinger" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Einstellungen öffnen" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Άνοιγμα ρυθμίσεων" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open Settings" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir Ajustes" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Avaa asetukset" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Ouvrir les réglages" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Otvori postavke" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Beállítások megnyitása" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Apri Impostazioni" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "設定を開く" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "설정 열기" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Åpne innstillinger" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Instellingen openen" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Otwórz ustawienia" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Abrir Configurações" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Deschide setările" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Открыть настройки" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Otvoriť nastavenia" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Öppna inställningar" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Ayarları Aç" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "打开设置" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "打開設定" } }
+      }
+    },
+    "Rome" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "روما" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Řím" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Rom" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Rom" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Ρώμη" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rome" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Roma" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Rooma" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Rome" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Rim" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Róma" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Roma" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "ローマ" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "로마" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Roma" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Rome" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Rzym" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Roma" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Roma" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Рим" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Rím" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Rom" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Roma" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "罗马" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "羅馬" } }
+      }
+    },
+    "To re-center on your position, enable Location in Settings." : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "لإعادة التوسيط على موقعك، قم بتفعيل الموقع في الإعدادات." } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Chcete-li se vrátit na svou polohu, povolte Polohu v Nastavení." } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "For at centrere på din placering skal du aktivere Placering i Indstillinger." } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Um auf Ihren Standort zu zentrieren, aktivieren Sie Standort in den Einstellungen." } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Για να επανακεντρωθείτε στη θέση σας, ενεργοποιήστε την Τοποθεσία στις Ρυθμίσεις." } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "To re-center on your position, enable Location in Settings." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Para recentrar en tu ubicación, activa la Ubicación en Ajustes." } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Voit palata omaan sijaintiisi ottamalla Sijainti käyttöön Asetuksissa." } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Pour recentrer sur votre position, activez la localisation dans les réglages." } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Za povratak na svoju lokaciju, omogućite Lokaciju u Postavkama." } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "A saját helyzetre való visszaközpontosításhoz engedélyezze a Helyzet funkciót a Beállításokban." } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Per centrare sulla tua posizione, abilita la Posizione nelle Impostazioni." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "現在地に再中央揃えするには、設定で位置情報を有効にしてください。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "내 위치로 다시 중심을 맞추려면 설정에서 위치를 활성화하세요." } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "For å sentrere på din plassering, aktiver Sted i Innstillinger." } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Om op uw locatie te centreren, schakelt u Locatie in bij Instellingen." } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Aby wyśrodkować na swojej pozycji, włącz Lokalizację w Ustawieniach." } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Para centralizar na sua localização, ative a Localização em Configurações." } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Pentru a recentra pe poziția dvs., activați Locația în Setări." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Чтобы вернуться к своей геопозиции, включите Геопозицию в Настройках." } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Ak sa chcete vrátiť na svoju polohu, povoľte Polohu v Nastaveniach." } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "För att centrera på din plats, aktivera Plats i Inställningar." } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Konumunuza yeniden odaklanmak için Ayarlar'da Konumu etkinleştirin." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "要重新定位到您的位置，请在设置中启用位置服务。" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "要重新定位到您的位置，請在設定中啟用位置服務。" } }
+      }
+    },
+    "Waiting for GPS signal\u2026" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "انتظار إشارة GPS…" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Čekání na GPS signál…" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Venter på GPS-signal…" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Warte auf GPS-Signal…" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Αναμονή σήματος GPS…" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Waiting for GPS signal\u2026" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esperando señal GPS…" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Odotetaan GPS-signaalia…" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "En attente du signal GPS…" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Čekanje GPS signala…" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "GPS-jel várakozása…" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Attesa del segnale GPS…" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "GPS信号を待っています…" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "GPS 신호 대기 중…" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Venter på GPS-signal…" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Wachten op GPS-signaal…" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Oczekiwanie na sygnał GPS…" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Aguardando sinal de GPS…" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Așteptare semnal GPS…" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Ожидание сигнала GPS…" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Čakanie na GPS signál…" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Väntar på GPS-signal…" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "GPS sinyali bekleniyor…" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "等待GPS信号…" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "等待GPS訊號…" } }
+      }
+    },
+    "Zooms to this cluster" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "تكبير هذه المجموعة" } },
+        "cs" : { "stringUnit" : { "state" : "translated", "value" : "Přiblížit na tento shluk" } },
+        "da" : { "stringUnit" : { "state" : "translated", "value" : "Zoom til denne klynge" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Auf diesen Cluster heranzoomen" } },
+        "el" : { "stringUnit" : { "state" : "translated", "value" : "Εστίαση σε αυτή την ομάδα" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Zooms to this cluster" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Acercar a este grupo" } },
+        "fi" : { "stringUnit" : { "state" : "translated", "value" : "Lähennä tähän ryhmään" } },
+        "fr" : { "stringUnit" : { "state" : "translated", "value" : "Zoom sur ce groupe" } },
+        "hr" : { "stringUnit" : { "state" : "translated", "value" : "Povećaj na ovu skupinu" } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Közelítés erre a csoportra" } },
+        "it" : { "stringUnit" : { "state" : "translated", "value" : "Ingrandisce questo gruppo" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "このクラスターにズーム" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이 클러스터로 확대" } },
+        "nb" : { "stringUnit" : { "state" : "translated", "value" : "Zoom til denne klyngen" } },
+        "nl" : { "stringUnit" : { "state" : "translated", "value" : "Inzoomen op dit cluster" } },
+        "pl" : { "stringUnit" : { "state" : "translated", "value" : "Powiększ do tego skupiska" } },
+        "pt-BR" : { "stringUnit" : { "state" : "translated", "value" : "Ampliar este grupo" } },
+        "ro" : { "stringUnit" : { "state" : "translated", "value" : "Mărire la acest grup" } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Увеличить до кластера" } },
+        "sk" : { "stringUnit" : { "state" : "translated", "value" : "Priblíž na túto skupinu" } },
+        "sv" : { "stringUnit" : { "state" : "translated", "value" : "Zooma till detta kluster" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Bu kümeyi yakınlaştır" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "缩放到此群" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "縮放到此群" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
+```
+
+- [ ] **Step 2: Run all tests to verify the smoke test passes**
+
+```bash
+xcodebuild test -project thirstyinrome.xcodeproj -scheme thirstyinrome -destination 'platform=iOS Simulator,OS=latest,name=iPhone 17' -skip-testing:thirstyinromeUITests 2>&1 | grep -E "error:|warning:|Test Suite|Test Case|PASSED|FAILED|BUILD SUCCEEDED|BUILD FAILED|TEST SUCCEEDED|TEST FAILED"
+```
+
+Expected: all tests PASSED, TEST SUCCEEDED
+
+- [ ] **Step 3: Run the build to confirm no regressions**
+
+```bash
+xcodebuild build -project thirstyinrome.xcodeproj -scheme thirstyinrome -destination 'platform=iOS Simulator,OS=latest,name=iPhone 17' 2>&1 | grep -E "error:|warning:|BUILD SUCCEEDED|BUILD FAILED"
+```
+
+Expected: BUILD SUCCEEDED (no errors)
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add thirstyinrome/Localizable.xcstrings
+git commit -m "feat: add Localizable.xcstrings for 25 locales (FEAT-005)"
+```
