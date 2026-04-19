@@ -16,6 +16,8 @@ struct ContentView: View {
     )
     @State private var hasJumpedToUserLocation = false
     @State private var mapSpan: Double = ContentView.zoomedInSpan
+    @State private var selectedPlaceID: String?
+    @State private var selectedPlace: Place?
 
     private let romeRegion = MKCoordinateRegion(
         center: ContentView.romeCenter,
@@ -24,7 +26,7 @@ struct ContentView: View {
 
     var body: some View {
         let result = viewModel.clusteringResult()
-        Map(position: $cameraPosition) {
+        Map(position: $cameraPosition, selection: $selectedPlaceID) {
             if mapSpan > ContentView.clusteringThreshold {
                 ForEach(result.clusters) { cluster in
                     Annotation("", coordinate: cluster.coordinate) {
@@ -50,6 +52,7 @@ struct ContentView: View {
                         place.title ?? "Fontanella",
                         coordinate: CLLocationCoordinate2D(latitude: place.lat, longitude: place.lon)
                     )
+                    .tag(place.id)
                 }
             } else {
                 ForEach(viewModel.places) { place in
@@ -57,6 +60,7 @@ struct ContentView: View {
                         place.title ?? "Fontanella",
                         coordinate: CLLocationCoordinate2D(latitude: place.lat, longitude: place.lon)
                     )
+                    .tag(place.id)
                 }
             }
             UserAnnotation()
@@ -89,6 +93,12 @@ struct ContentView: View {
         .onMapCameraChange(frequency: .onEnd) { context in
             mapSpan = context.region.span.latitudeDelta
         }
+        .onChange(of: selectedPlaceID) { _, newID in
+            selectedPlace = newID.flatMap { id in viewModel.places.first { $0.id == id } }
+        }
+        .sheet(item: $selectedPlace, onDismiss: { selectedPlaceID = nil }) { place in
+            FountainSheet(place: place)
+        }
         .onChange(of: viewModel.userLocation) { _, newLocation in
             guard !hasJumpedToUserLocation, let location = newLocation else { return }
             hasJumpedToUserLocation = true
@@ -113,6 +123,7 @@ struct ContentView: View {
             span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
         ))
     }
+
 }
 
 #Preview {
