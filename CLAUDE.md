@@ -50,5 +50,5 @@ Planned features and bugs are tracked in `BACKLOG.md`. IDs follow the format `FE
 2. **Plan** — `superpowers:brainstorming` hands off to `superpowers:writing-plans`, which saves an implementation plan to `docs/superpowers/plans/`.
 3. **Execute** — invoke `superpowers:subagent-driven-development` to implement the plan task-by-task with spec and quality review gates.
 4. **Finish** — invoke `superpowers:finishing-a-development-branch` to decide how to integrate the work.
-5. **Update backlog** — mark the item done (strikethrough + ✓ Done date + branch + AC met), then move it to the `## Completed` section at the bottom of `BACKLOG.md`.
+5. **Update backlog** — mark the item done (strikethrough + ✓ Done date + branch + AC met), then move it to `COMPLETED.md`.
 6. **Update CLAUDE.md** — if the item introduced non-obvious design decisions or changed ones already documented here, update the Architecture section.
