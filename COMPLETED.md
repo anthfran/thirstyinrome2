@@ -1,5 +1,13 @@
 # Completed
 
+### ~~FEAT-005: Localize UI for top 25 tourist countries to Italy~~ ✓ Done 2026-04-19
+**Branch:** `feat/feat-005-localization`
+**AC met:**
+- All 11 user-visible strings live in `Localizable.xcstrings` (fountain names and `"Fontanella"` fallback excluded by design)
+- All 25 locales have translations: en, it, de, fr, es, pt-BR, ja, zh-Hans, zh-Hant, nl, pl, ru, ko, sv, da, nb, cs, hu, ro, fi, ar, tr, el, hr, sk
+- Device locale automatically selects the correct language; English is the fallback
+- Build succeeds and all existing tests pass
+
 ### ~~FEAT-008: Two-tone splash screen background~~ ✓ Done 2026-04-19
 **Branch:** `feat/feat-008-two-tone-splash`
 **AC met:**
