@@ -170,12 +170,18 @@ struct LocalizationTests {
     @Test func testLocalizableCatalogContainsExpectedKeys() throws {
         let url = try #require(Bundle.main.url(forResource: "Localizable", withExtension: "xcstrings"))
         let data = try Data(contentsOf: url)
-        let json = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let json = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
         let strings = try #require(json["strings"] as? [String: Any])
         #expect(strings["Rome"] != nil)
         #expect(strings["My Location"] != nil)
         #expect(strings["Cancel"] != nil)
         #expect(strings["Cluster of %lld fountains"] != nil)
         #expect(strings["Open in Apple Maps"] != nil)
+        #expect(strings["Open in Google Maps"] != nil)
+        #expect(strings["Open Settings"] != nil)
+        #expect(strings["Location Access Required"] != nil)
+        #expect(strings["Zooms to this cluster"] != nil)
+        #expect(strings["Waiting for GPS signal\u{2026}"] != nil)
+        #expect(strings["To re-center on your position, enable Location in Settings."] != nil)
     }
 }
