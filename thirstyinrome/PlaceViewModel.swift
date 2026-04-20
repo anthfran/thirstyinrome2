@@ -7,7 +7,6 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
     var places: [Place] = []
     var userLocation: CLLocation?
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
-    var userHeading: CLHeading?
 
     private let locationManager = CLLocationManager()
     private var isUpdatingLocation = false
@@ -73,11 +72,6 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
         if (error as? CLError)?.code == .locationUnknown {
             userLocation = nil
         }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        guard newHeading.headingAccuracy >= 0 else { return }
-        userHeading = newHeading
     }
 
     // MARK: - Clustering
