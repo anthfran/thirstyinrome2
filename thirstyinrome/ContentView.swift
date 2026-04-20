@@ -133,6 +133,7 @@ struct ContentView: View {
     }
 
     private func zoomToCluster(_ cluster: Cluster) {
+        isHeadingUp = false
         let lats = cluster.places.map(\.lat)
         let lons = cluster.places.map(\.lon)
         let minLat = lats.min()!
