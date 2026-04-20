@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var mapSpan: Double = ContentView.zoomedInSpan
     @State private var selectedPlaceID: String?
     @State private var selectedPlace: Place?
+    @State private var isHeadingUp = false
 
     private let romeRegion = MKCoordinateRegion(
         center: ContentView.romeCenter,
@@ -69,6 +70,7 @@ struct ContentView: View {
         .ignoresSafeArea()
         .overlay(alignment: .bottomLeading) {
             Button {
+                isHeadingUp = false
                 cameraPosition = .region(romeRegion)
             } label: {
                 Label("Rome", systemImage: "building.columns")
@@ -82,12 +84,29 @@ struct ContentView: View {
         }
         .overlay(alignment: .bottomTrailing) {
             LocationButton { location in
+                isHeadingUp = false
                 cameraPosition = .region(MKCoordinateRegion(
                     center: location.coordinate,
                     span: MKCoordinateSpan(latitudeDelta: Self.zoomedInSpan, longitudeDelta: Self.zoomedInSpan)
                 ))
             }
             .safeAreaPadding(.bottom)
+            .padding(.trailing, 16)
+        }
+        .overlay(alignment: .topTrailing) {
+            Button {
+                isHeadingUp.toggle()
+                if isHeadingUp {
+                    cameraPosition = .userLocation(followsHeading: true, fallback: cameraPosition)
+                }
+            } label: {
+                Label("Heading Up", systemImage: "safari")
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(isHeadingUp ? .blue : Color(UIColor.systemGray))
+            .clipShape(.capsule)
+            .shadow(radius: 4)
+            .safeAreaPadding(.top)
             .padding(.trailing, 16)
         }
         .onMapCameraChange(frequency: .onEnd) { context in
@@ -106,6 +125,10 @@ struct ContentView: View {
                 center: location.coordinate,
                 span: MKCoordinateSpan(latitudeDelta: ContentView.zoomedInSpan, longitudeDelta: ContentView.zoomedInSpan)
             ))
+        }
+        .onChange(of: cameraPosition) { _, newPosition in
+            guard isHeadingUp, newPosition.positionedByUser else { return }
+            isHeadingUp = false
         }
     }
 
