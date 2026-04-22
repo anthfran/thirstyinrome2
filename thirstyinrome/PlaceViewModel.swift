@@ -55,6 +55,7 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
             if !isUpdatingLocation {
                 isUpdatingLocation = true
                 manager.startUpdatingLocation()
+                manager.startUpdatingHeading()
             }
         default:
             break
