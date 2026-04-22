@@ -1,5 +1,15 @@
 # Completed
 
+### ~~FEAT-007: Compass/heading map mode~~ ✓ Done 2026-04-22
+**Branch:** `feat/feat-007-compass-heading`
+**AC met:**
+- Compass toggle button (`safari` SF Symbol) in top-right corner
+- Tapping enters heading-up mode: `MapCameraPosition.userLocation(followsHeading: true)` rotates map to match device heading
+- User location dot shows directional cone in both north-up and heading-up modes when heading data flows (always-on via `startUpdatingHeading()`)
+- Tapping again returns to north-up; cone remains visible
+- Panning, Rome button, GPS button, and cluster-zoom all exit heading-up mode without interference
+- Build succeeds and all existing tests pass
+
 ### ~~FEAT-005: Localize UI for top 25 tourist countries to Italy~~ ✓ Done 2026-04-19
 **Branch:** `feat/feat-005-localization`
 **AC met:**
