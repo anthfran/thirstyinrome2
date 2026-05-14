@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import Combine
 
 struct ContentView: View {
     private static let romeCenter = CLLocationCoordinate2D(latitude: 41.899159, longitude: 12.473065)
@@ -16,9 +17,12 @@ struct ContentView: View {
     )
     @State private var hasJumpedToUserLocation = false
     @State private var mapSpan: Double = ContentView.zoomedInSpan
+    @State private var currentCameraDistance: Double = 1000
     @State private var selectedPlaceID: String?
     @State private var selectedPlace: Place?
     @State private var isHeadingUp = false
+    @State private var displayedHeading: Double = 0
+    @State private var currentCameraHeading: Double = 0
 
     private let romeRegion = MKCoordinateRegion(
         center: ContentView.romeCenter,
@@ -64,6 +68,14 @@ struct ContentView: View {
                     .tag(place.id)
                 }
             }
+            if let location = viewModel.userLocation {
+                Annotation("", coordinate: location.coordinate) {
+                    HeadingCone()
+                        .fill(.blue.opacity(0.2))
+                        .frame(width: 80, height: 80)
+                        .rotationEffect(isHeadingUp ? .zero : .degrees(viewModel.currentHeading - currentCameraHeading))
+                }
+            }
             UserAnnotation()
         }
         .mapStyle(.standard)
@@ -96,11 +108,19 @@ struct ContentView: View {
         .overlay(alignment: .topTrailing) {
             Button {
                 isHeadingUp.toggle()
-                if isHeadingUp {
-                    cameraPosition = .userLocation(followsHeading: true, fallback: cameraPosition)
+                if isHeadingUp, let location = viewModel.userLocation {
+                    displayedHeading = viewModel.currentHeading
+                    withAnimation(.easeOut(duration: 0.5)) {
+                        cameraPosition = .camera(MapCamera(
+                            centerCoordinate: location.coordinate,
+                            distance: currentCameraDistance,
+                            heading: displayedHeading,
+                            pitch: 0
+                        ))
+                    }
                 }
             } label: {
-                Label("Heading Up", systemImage: "safari")
+                Label("Compass", systemImage: "safari").labelStyle(.iconOnly)
             }
             .buttonStyle(.borderedProminent)
             .tint(isHeadingUp ? .blue : Color(UIColor.systemGray))
@@ -111,6 +131,8 @@ struct ContentView: View {
         }
         .onMapCameraChange(frequency: .onEnd) { context in
             mapSpan = context.region.span.latitudeDelta
+            currentCameraDistance = context.camera.distance
+            currentCameraHeading = context.camera.heading
         }
         .onChange(of: selectedPlaceID) { _, newID in
             selectedPlace = newID.flatMap { id in viewModel.places.first { $0.id == id } }
@@ -119,11 +141,35 @@ struct ContentView: View {
             FountainSheet(place: place)
         }
         .onChange(of: viewModel.userLocation) { _, newLocation in
-            guard !hasJumpedToUserLocation, let location = newLocation else { return }
-            hasJumpedToUserLocation = true
-            cameraPosition = .region(MKCoordinateRegion(
-                center: location.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: ContentView.zoomedInSpan, longitudeDelta: ContentView.zoomedInSpan)
+            guard let location = newLocation else { return }
+            if !hasJumpedToUserLocation {
+                hasJumpedToUserLocation = true
+                cameraPosition = .region(MKCoordinateRegion(
+                    center: location.coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: ContentView.zoomedInSpan, longitudeDelta: ContentView.zoomedInSpan)
+                ))
+                return
+            }
+            guard isHeadingUp else { return }
+            cameraPosition = .camera(MapCamera(
+                centerCoordinate: location.coordinate,
+                distance: currentCameraDistance,
+                heading: displayedHeading,
+                pitch: 0
+            ))
+        }
+        .onReceive(Timer.publish(every: 1.0 / 60.0, on: .main, in: .common).autoconnect()) { _ in
+            guard isHeadingUp, let location = viewModel.userLocation else { return }
+            let target = viewModel.currentHeading
+            let delta = ((target - displayedHeading + 540).truncatingRemainder(dividingBy: 360)) - 180
+            guard abs(delta) >= 0.1 else { return }
+            displayedHeading += delta * 0.5
+            displayedHeading = ((displayedHeading.truncatingRemainder(dividingBy: 360)) + 360).truncatingRemainder(dividingBy: 360)
+            cameraPosition = .camera(MapCamera(
+                centerCoordinate: location.coordinate,
+                distance: currentCameraDistance,
+                heading: displayedHeading,
+                pitch: 0
             ))
         }
         .onChange(of: cameraPosition) { _, newPosition in
@@ -148,6 +194,23 @@ struct ContentView: View {
         ))
     }
 
+}
+
+private struct HeadingCone: Shape {
+    func path(in rect: CGRect) -> Path {
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+        // 45° sector pointing screen-up. In SwiftUI's Y-down coords clockwise: false
+        // sweeps visually clockwise (upper-left → top → upper-right = the short 45° arc).
+        var path = Path()
+        path.move(to: center)
+        path.addArc(center: center, radius: radius,
+                    startAngle: .degrees(-112.5),
+                    endAngle: .degrees(-67.5),
+                    clockwise: false)
+        path.closeSubpath()
+        return path
+    }
 }
 
 #Preview {

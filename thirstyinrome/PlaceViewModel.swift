@@ -6,6 +6,7 @@ import Observation
 final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
     var places: [Place] = []
     var userLocation: CLLocation?
+    var currentHeading: Double = 0
     var authorizationStatus: CLAuthorizationStatus = .notDetermined
 
     private let locationManager = CLLocationManager()
@@ -37,6 +38,7 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = 10
+        locationManager.headingFilter = 2
         if locationManager.authorizationStatus == .notDetermined {
             locationManager.requestWhenInUseAuthorization()
         }
@@ -66,6 +68,11 @@ final class PlaceViewModel: NSObject, CLLocationManagerDelegate {
         if let location = locations.last {
             userLocation = location
         }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        guard newHeading.headingAccuracy >= 0 else { return }
+        currentHeading = newHeading.trueHeading
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
