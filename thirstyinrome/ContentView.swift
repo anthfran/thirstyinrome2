@@ -79,6 +79,7 @@ struct ContentView: View {
             UserAnnotation()
         }
         .mapStyle(.standard)
+        .mapControls { }
         .ignoresSafeArea()
         .overlay(alignment: .bottomLeading) {
             Button {
@@ -106,26 +107,29 @@ struct ContentView: View {
             .padding(.trailing, 16)
         }
         .overlay(alignment: .topTrailing) {
-            Button {
-                isHeadingUp.toggle()
-                if isHeadingUp, let location = viewModel.userLocation {
-                    displayedHeading = viewModel.currentHeading
-                    withAnimation(.easeOut(duration: 0.5)) {
-                        cameraPosition = .camera(MapCamera(
-                            centerCoordinate: location.coordinate,
-                            distance: currentCameraDistance,
-                            heading: displayedHeading,
-                            pitch: 0
-                        ))
+            VStack(alignment: .trailing, spacing: 8) {
+                MapCompass()
+                Button {
+                    isHeadingUp.toggle()
+                    if isHeadingUp, let location = viewModel.userLocation {
+                        displayedHeading = viewModel.currentHeading
+                        withAnimation(.easeOut(duration: 0.5)) {
+                            cameraPosition = .camera(MapCamera(
+                                centerCoordinate: location.coordinate,
+                                distance: currentCameraDistance,
+                                heading: displayedHeading,
+                                pitch: 0
+                            ))
+                        }
                     }
+                } label: {
+                    Label("Compass", systemImage: "safari").labelStyle(.iconOnly)
                 }
-            } label: {
-                Label("Compass", systemImage: "safari").labelStyle(.iconOnly)
+                .buttonStyle(.borderedProminent)
+                .tint(isHeadingUp ? .blue : Color(UIColor.systemGray))
+                .clipShape(.capsule)
+                .shadow(radius: 4)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(isHeadingUp ? .blue : Color(UIColor.systemGray))
-            .clipShape(.capsule)
-            .shadow(radius: 4)
             .safeAreaPadding(.top)
             .padding(.trailing, 16)
         }
